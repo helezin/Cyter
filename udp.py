@@ -1,7 +1,5 @@
 import signal
 import time
-import figlet
-import pyfiglet
 import socket
 import random
 import threading
@@ -18,13 +16,13 @@ init(autoreset=True)
 def print_banner():
     # Print banner with pyfiglet and colors
     os.system('clear' if name != 'nt' else 'cls')
-	os.system("pyfiglet --color=CYAN =FreezeNET ")
+    os.system("pyfiglet --color=GREEN FreezeNET ")
 
 def clear_screen():
     os.system('clear' if name != 'nt' else 'cls')
 
 def print_attack_status(ip, port, protocol, ping):
-    print(Fore.CYAN + f"[FN] Ataque enviado: {ip}:{port} - {protocol} | Ping: {ping}ms")
+    print(Fore.GREEN + f"[FN] Ataque enviado: \033[0m{ip}:{port} - {protocol}\033[32m | Ping: \033[0m{ping}ms")
 
 def get_ping(ip):
     try:
@@ -36,7 +34,7 @@ def get_ping(ip):
         time_ms = output.split('time=')[-1].split(' ms')[0]
         return time_ms
     except subprocess.CalledProcessError:
-        return 'N/A'
+        return '\033[93m+999'
 
 def udp_flood(ip, port, duration, packets):
     data = random._urandom(1024)
@@ -69,15 +67,15 @@ def tcp_flood(ip, port, duration, packets):
 def main():
     print_banner()
 
-    test = input(Fore.WHITE + "Deseja continuar? (y/n): ").strip().lower()
+    test = input(Fore.CYAN + "\033[93mDeseja continuar? (y/n): ").strip().lower()
     if test == "n":
         sys.exit(0)
 
-    ip = input(Fore.WHITE + "Endereço/Ip: ").strip()
-    port = int(input(Fore.WHITE + "Port: ").strip())
-    choice = input(Fore.WHITE + "Udp-Flood (y/n): ").strip().lower()
-    duration = int(input(Fore.WHITE + "Tempo: ").strip())
-    packets = int(input(Fore.WHITE + "Pacotes: ").strip())
+    ip = input(Fore.CYAN + "\033[92mEndereço/Ip: \033[0m").strip()
+    port = int(input(Fore.CYAN + "\033[92mPort: \033[0m").strip())
+    choice = input(Fore.CYAN + "\033[92mUdp-Flood (y/n): \033[0m").strip().lower()
+    duration = int(input(Fore.CYAN + "\033[92mTempo: \033[0m").strip())
+    packets = int(input(Fore.CYAN + "\033[92mPacotes: \033[0m").strip())
 
     if choice == 'y':
         target_function = udp_flood
