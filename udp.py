@@ -1,5 +1,7 @@
 import signal
 import time
+import figlet
+import pyfiglet
 import socket
 import random
 import threading
