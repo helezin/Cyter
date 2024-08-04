@@ -16,7 +16,8 @@ init(autoreset=True)
 def print_banner():
     # Print banner with pyfiglet and colors
     os.system('clear' if name != 'nt' else 'cls')
-    os.system("pyfiglet --color=GREEN FreezeNET ")
+    banner = figlet_format("FreezeNET", font="slant")
+    print(Fore.GREEN + banner)
 
 def clear_screen():
     os.system('clear' if name != 'nt' else 'cls')
@@ -35,6 +36,8 @@ def get_ping(ip):
         return time_ms
     except subprocess.CalledProcessError:
         return '\033[93m+999'
+    except Exception as e:
+        return f'\033[93mErro: {str(e)}'
 
 def udp_flood(ip, port, duration, packets):
     data = random._urandom(1024)
@@ -93,7 +96,7 @@ def main():
 
 def exit_gracefully(signum, frame):
     clear_screen()
-    print(Fore.CYAN + "Saindo... Obrigado por usar o script.")
+    print(Fore.GREEN + "Saindo... Obrigado por usar o script.")
     sys.exit(0)
 
 if __name__ == '__main__':
